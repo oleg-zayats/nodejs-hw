@@ -7,28 +7,26 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 1. Стандартні Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors()); // Дозволяє запити з інших доменів
+app.use(express.json()); // Парсить JSON у тілі запиту (req.body)
 
 // 2. Middleware для логування (pino-http)
 app.use(
   pino({
     transport: {
-      target: 'pino-pretty', // Робить логи читабельними в консолі
+      target: 'pino-pretty', // Робить логи в консолі красивими та читабельними
     },
   })
 );
 
-// --- Маршрути ---
+// --- Маршрути (Routes) ---
 
-// GET /notes
 app.get('/notes', (req, res) => {
   res.status(200).json({
     message: 'Retrieved all notes',
   });
 });
 
-// GET /notes/:noteId
 app.get('/notes/:noteId', (req, res) => {
   const { noteId } = req.params;
   res.status(200).json({
@@ -36,12 +34,12 @@ app.get('/notes/:noteId', (req, res) => {
   });
 });
 
-// GET /test-error (імітація помилки)
+// Тестовий маршрут для імітації помилки
 app.get('/test-error', (req, res) => {
   throw new Error('Simulated server error');
 });
 
-// --- Обробка помилок ---
+// --- Обробка помилок (Мають бути ПІСЛЯ маршрутів) ---
 
 // 3. Обробка неіснуючих маршрутів (404)
 app.use((req, res, next) => {
@@ -51,7 +49,7 @@ app.use((req, res, next) => {
 });
 
 // 4. Глобальний обробник помилок (500)
-// Важливо: має бути 4 аргументи (err, req, res, next)
+// Важливо: обробник помилок обов'язково повинен мати 4 аргументи
 app.use((err, req, res, next) => {
   res.status(500).json({
     message: err.message || 'Internal Server Error',
