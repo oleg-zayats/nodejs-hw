@@ -232,10 +232,5 @@ export const Note = model('note', noteSchema);
     "title": "Skill improvement",
     "content": "Learn TypeScript basics",
     "tag": "Ideas"
-  },
-  {
-    "title": "Daily routine",
-    "content": "Wake up 7 AM, read 30 minutes",
-    "tag": "Personal"
   }
 ];
