@@ -1,60 +1,31 @@
 import express from 'express';
 import cors from 'cors';
-import pino from 'pino-http';
 import 'dotenv/config';
+
+
+import { connectMongoDB } from '/db/connectMongoDB.js';
+import { logger } from '/middleware/logger.js';
+import { notFoundHandler } from '/middleware/notFoundHandler.js';
+import { errorHandler } from '/middleware/errorHandler.js';
+import banan from '/routes/notesRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 1. Стандартні Middleware
-app.use(cors()); // Дозволяє запити з інших доменів
-app.use(express.json()); // Парсить JSON у тілі запиту (req.body)
+// Глобальні middleware
+app.use(logger);         // 1. Логер першим — бачить усі запити
+app.use(express.json()); // 2. Парсинг JSON-тіла
+app.use(cors());         // 3. Дозвіл для запитів з інших доменів
+app.use('/students', banan);
+// ...тут ваші маршрути
 
-// 2. Middleware для логування (pino-http)
-app.use(
-  pino({
-    transport: {
-      target: 'pino-pretty', // Робить логи в консолі красивими та читабельними
-    },
-  })
-);
+// 404 — якщо маршрут не знайдено
+app.use(notFoundHandler);
 
-// --- Маршрути (Routes) ---
+// Error — якщо під час запиту виникла помилка
+app.use(errorHandler);
 
-app.get('/notes', (req, res) => {
-  res.status(200).json({
-    message: 'Retrieved all notes',
-  });
-});
-
-app.get('/notes/:noteId', (req, res) => {
-  const { noteId } = req.params;
-  res.status(200).json({
-    message: `Retrieved note with ID: ${noteId}`,
-  });
-});
-
-// Тестовий маршрут для імітації помилки
-app.get('/test-error', (req, res) => {
-  throw new Error('Simulated server error');
-});
-
-// --- Обробка помилок (Мають бути ПІСЛЯ маршрутів) ---
-
-// 3. Обробка неіснуючих маршрутів (404)
-app.use((req, res, next) => {
-  res.status(404).json({
-    message: 'Route not found',
-  });
-});
-
-// 4. Глобальний обробник помилок (500)
-// Важливо: обробник помилок обов'язково повинен мати 4 аргументи
-app.use((err, req, res, next) => {
-  res.status(500).json({
-    message: err.message || 'Internal Server Error',
-  });
-});
+await connectMongoDB();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
