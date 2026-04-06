@@ -16,6 +16,29 @@ export const getAllNotes = async (req, res, next) => {
   }
 };
 
+export const updateNote = async (req, res, next) => {
+  try {
+    const { noteId } = req.params;
+
+    // Оновлення з опцією повернення зміненого документа
+    const result = await Note.findByIdAndUpdate(noteId, req.body, {
+      new: true, // Це аналог returnDocument: 'after' у Mongoose
+    });
+
+    if (!result) {
+      throw createHttpError(404, 'Note not found');
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: 'Successfully updated the note!',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+  
 // GET /notes/:noteId
 export const getNoteById = async (req, res, next) => {
   try {

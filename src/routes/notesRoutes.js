@@ -11,10 +11,10 @@ router.get('/students', async (req, res) => {
 });
 
 
-
 router.get('/notes', notesController.getAllNotes);
 router.get('/notes/:noteId', notesController.getNoteById);
 router.post('/notes', notesController.createNote);
+router.patch('/notes/:noteId', notesController.updateNote); // Додано PATCH
 router.delete('/notes/:noteId', notesController.deleteNote);
 router.get('/students/:studentId', async (req, res) => {
   const { studentId } = req.params;
