@@ -26,7 +26,7 @@ app.use(notFoundHandler);
 // Error — якщо під час запиту виникла помилка
 app.use(errorHandler);
 
-await connectMongoDB();
+await connectMongoDB.js();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
