@@ -8,7 +8,6 @@ export const errorHandler = (err, req, res, next) => {
   // Перевірка, чи це помилка HttpError
   if (isHttpError(err)) {
     return res.status(err.status).json({
-      status: err.status,
       message: err.message,
     });
   }
@@ -17,6 +16,5 @@ export const errorHandler = (err, req, res, next) => {
   res.status(500).json({
     status: 500,
     message: 'Something went wrong',
-    error: err.message,
   });
 };
