@@ -1,20 +1,23 @@
 // 4. Глобальний обробник помилок (500)
 // Важливо: обробник помилок обов'язково повинен мати 4 аргументи
 // src/middleware/errorHandler.js
-// src/middleware/errorHandler.js
-import { isHttpError } from 'http-errors';
+import { HttpError } from "http-errors";
 
 export const errorHandler = (err, req, res, next) => {
-  // Перевірка, чи це помилка HttpError
-  if (isHttpError(err)) {
+  console.error("Error Middleware:", err);
+
+  // Якщо помилка створена через http-errors
+  if (err instanceof HttpError) {
     return res.status(err.status).json({
-      message: err.message,
+      message: err.message || err.name,
     });
   }
+  const isProd = process.env.NODE_ENV === "production";
 
-  // Для всіх інших помилок (500)
+  // Усі інші помилки — як внутрішні
   res.status(500).json({
-    status: 500,
-    message: 'Something went wrong',
+    message: isProd
+      ? "Something went wrong. Please try again later."
+      : err.message,
   });
 };
